@@ -204,14 +204,14 @@ All parameters and fields: <https://everyinfra.com/en/aliexpress-api/variants?ut
 | Field | Meaning |
 |---|---|
 | `average_star` | Average star rating. |
-| `total_reviews` | Total number of reviews. |
-| `positive_rate` | Positive review rate. |
-| `negative_rate` | Negative review rate. |
-| `five_star` | Five-star reviews, with count (number of reviews) and rate (share). |
-| `four_star` | Four-star reviews, with count and rate. |
-| `three_star` | Three-star reviews, with count and rate. |
-| `two_star` | Two-star reviews, with count and rate. |
-| `one_star` | One-star reviews, with count and rate. |
+| `total_reviews` | Total number of reviews (reviews with written text). |
+| `positive_rate` | Positive rating share, as a percentage (94.1 means 94.1%). |
+| `negative_rate` | Negative rating share, as a percentage. |
+| `five_star` | Five-star ratings, with count (number of ratings, including star-only ratings without text). |
+| `four_star` | Four-star ratings, with count. |
+| `three_star` | Three-star ratings, with count. |
+| `two_star` | Two-star ratings, with count. |
+| `one_star` | One-star ratings, with count. |
 | `platform` | Source platform identifier, the same as platform in the request (for example xiaohongshu, tiktok). |
 
 All parameters and fields: <https://everyinfra.com/en/aliexpress-api/ratings?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
