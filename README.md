@@ -4,7 +4,7 @@
 
 ## English
 
-This repo reads public AliExpress data with Python or curl. You can search products by keyword and read a product's details, variants and reviews. You need one EveryInfra API key. You do not need an AliExpress account or cookie. The same API also works as an MCP tool in Claude and Cursor. Billing is per call: these 4 capabilities cost $1.39 per 1,000 calls (about $0.0014 per call). Failed calls and empty results are not charged. The EveryInfra AliExpress API has 6 capabilities, all listed on the platform page: <https://everyinfra.com/en/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
+This repo reads public AliExpress data with Python or curl. You can search products by keyword and read a product's details, variants, reviews and rating summary. You need one EveryInfra API key. You do not need an AliExpress account or cookie. The same API also works as an MCP tool in Claude and Cursor. Billing is per call: these 5 capabilities cost $1.39 per 1,000 calls (about $0.0014 per call). Failed calls and empty results are not charged. The EveryInfra AliExpress API has 6 capabilities, all listed on the platform page: <https://everyinfra.com/en/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
 
 ### Quick start
 
@@ -17,9 +17,10 @@ python main.py search "wireless earbuds" --out products.csv
 python main.py product "<product url>" --out product.json
 python main.py reviews "<product url>" --out reviews.csv
 python main.py variants "<product url>" --out variants.csv
+python main.py ratings "<product url>" --out ratings.json
 ```
 
-- For `product`, `reviews` and `variants`, pass a product link such as https://www.aliexpress.com/item/<product id>.html. The `url` from a `search` result works.
+- For `product`, `reviews`, `variants` and `ratings`, pass a product link such as https://www.aliexpress.com/item/<product id>.html. The `url` from a `search` result works.
 - `product` prices for the US and in USD by default.
 - Without `--out`, the command prints the first 3 rows as JSON. With `--out`, it saves a .csv or .json file. The CSV has a BOM, so Excel opens it without garbled text.
 - Register at everyinfra.com, then create the API key in the console. Steps: <https://everyinfra.com/en/docs?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api#quickstart>
@@ -33,7 +34,7 @@ curl -X POST https://api.everyinfra.com/api/v1/social \
   -d '{"platform":"aliexpress","action":"search","params":{"keyword":"wireless earbuds"}}'
 ```
 
-All capabilities use the same URL. Change `action` and `params` to call another one. Examples for `product_detail`, `reviews`, and `variants` are in [examples/curl.sh](examples/curl.sh).
+All capabilities use the same URL. Change `action` and `params` to call another one. Examples for `product_detail`, `reviews`, `variants`, and `ratings` are in [examples/curl.sh](examples/curl.sh).
 
 ### Claude and Cursor (MCP)
 
@@ -70,15 +71,16 @@ Custom connectors in Claude on the web and desktop, and ChatGPT, accept only a U
 | `product_detail` | $1.39 |
 | `reviews` | $1.39 |
 | `variants` | $1.39 |
+| `ratings` | $1.39 |
 
 - Billing is per call, about $0.0014 each. Failed calls, empty results, parameter errors, and authentication failures are not charged.
 - `search` is billed by the rows you ask for: every 50 rows count as one call, and blocks that come back with no rows are not charged.
 - A new account gets a $1 trial allowance, valid for 24 hours. No credit card is needed. How to claim it: <https://everyinfra.com/en/pricing?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
-- Prices for the other 2 AliExpress capabilities are on the platform page: <https://everyinfra.com/en/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
+- Prices for the 1 other AliExpress capability are on the platform page: <https://everyinfra.com/en/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
 
 ### Fields
 
-These are the fields that the 4 capabilities returned in our test. Each meaning is the first sentence of the field's entry in the API documentation. The link under each table has the full text.
+These are the fields that the 5 capabilities returned in our test. Each meaning is the first sentence of the field's entry in the API documentation. The link under each table has the full text.
 
 #### `search` (keyword search)
 
@@ -197,6 +199,23 @@ All parameters and fields: <https://everyinfra.com/en/aliexpress-api/reviews?utm
 
 All parameters and fields: <https://everyinfra.com/en/aliexpress-api/variants?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
 
+#### `ratings` (rating summary)
+
+| Field | Meaning |
+|---|---|
+| `average_star` | Average star rating. |
+| `total_reviews` | Total number of reviews. |
+| `positive_rate` | Positive review rate. |
+| `negative_rate` | Negative review rate. |
+| `five_star` | Five-star reviews, with count (number of reviews) and rate (share). |
+| `four_star` | Four-star reviews, with count and rate. |
+| `three_star` | Three-star reviews, with count and rate. |
+| `two_star` | Two-star reviews, with count and rate. |
+| `one_star` | One-star reviews, with count and rate. |
+| `platform` | Source platform identifier, the same as platform in the request (for example xiaohongshu, tiktok). |
+
+All parameters and fields: <https://everyinfra.com/en/aliexpress-api/ratings?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
+
 ### FAQ
 
 **Do I need an AliExpress account or cookie to call the API?**
@@ -230,7 +249,7 @@ Parameters and return fields for each capability are on the platform page: <http
 
 ### Tested
 
-Before release, we ran the 4 commands in Quick start against the live API with this repo's code.
+Before release, we ran the 5 commands in Quick start against the live API with this repo's code.
 
 | Command | Time (Singapore, UTC+8) | Rows | Charged |
 |---|---|---|---|
@@ -238,10 +257,11 @@ Before release, we ran the 4 commands in Quick start against the live API with t
 | `python main.py product "<product url>" --out product.json` | 2026-11-25 13:22 | 1 | $0.001389 |
 | `python main.py reviews "<product url>" --out reviews.csv` | 2026-11-25 13:23 | 20 | $0.001389 |
 | `python main.py variants "<product url>" --out variants.csv` | 2026-11-25 13:27 | 1 | $0.001389 |
+| `python main.py ratings "<product url>" --out ratings.json` | 2026-11-25 15:31 | 1 | $0.001389 |
 
 ## 中文
 
-本仓库用 Python 或 curl 读速卖通公开数据：按关键词搜商品，读商品详情、规格变体和评价。只需一把 EveryInfra API Key，不用速卖通账号和 Cookie，也能作为 MCP 工具接进 Claude、Cursor。按调用次数计费，这 4 个能力每千次 $1.39（每次约 $0.0014），失败和空结果不收费。速卖通共 6 个能力：<https://everyinfra.com/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
+本仓库用 Python 或 curl 读速卖通公开数据：按关键词搜商品，读商品详情、规格变体、评价和评分汇总。只需一把 EveryInfra API Key，不用速卖通账号和 Cookie，也能作为 MCP 工具接进 Claude、Cursor。按调用次数计费，这 5 个能力每千次 $1.39（每次约 $0.0014），失败和空结果不收费。速卖通共 6 个能力：<https://everyinfra.com/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
 
 ### 快速开始
 
@@ -254,9 +274,10 @@ python main.py search "wireless earbuds" --out products.csv
 python main.py product "<商品链接>" --out product.json
 python main.py reviews "<商品链接>" --out reviews.csv
 python main.py variants "<商品链接>" --out variants.csv
+python main.py ratings "<商品链接>" --out ratings.json
 ```
 
-- `product`、`reviews`、`variants` 传商品链接，形如 https://www.aliexpress.com/item/<商品 ID>.html，可用 `search` 结果里的 `url`。
+- `product`、`reviews`、`variants`、`ratings` 传商品链接，形如 https://www.aliexpress.com/item/<商品 ID>.html，可用 `search` 结果里的 `url`。
 - `product` 默认按美国站、美元查价。
 - 不加 `--out` 时打印前 3 条 JSON；加 `--out` 存成 .csv 或 .json。CSV 带 BOM，Excel 直接打开不乱码。
 - API Key 在 everyinfra.com 注册后到控制台创建，步骤见 <https://everyinfra.com/docs?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api#quickstart>
@@ -270,7 +291,7 @@ curl -X POST https://api.everyinfra.com/api/v1/social \
   -d '{"platform":"aliexpress","action":"search","params":{"keyword":"wireless earbuds"}}'
 ```
 
-所有能力都发到同一个地址，换 `action` 和 `params` 就行；`product_detail`、`reviews`、`variants` 的写法见 [examples/curl.sh](examples/curl.sh)。
+所有能力都发到同一个地址，换 `action` 和 `params` 就行；`product_detail`、`reviews`、`variants`、`ratings` 的写法见 [examples/curl.sh](examples/curl.sh)。
 
 ### 接进 Claude、Cursor（MCP）
 
@@ -307,15 +328,16 @@ Claude 网页版和桌面版的自定义连接器、ChatGPT 只能填网址：�
 | 商品详情 | `product_detail` | $1.39 |
 | 评价 | `reviews` | $1.39 |
 | 商品变体 | `variants` | $1.39 |
+| 评分汇总 | `ratings` | $1.39 |
 
 - 按调用次数计费，每次约 $0.0014；失败、空结果、参数错误和鉴权失败都不收费。
 - `search` 按要的条数计费，每 50 条算一次调用，没返回数据的部分不收费。
 - 新账号有 $1 试用额度，24 小时内有效，不用信用卡，领取方式见 <https://everyinfra.com/pricing?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
-- 速卖通其他 2 个能力的单价见平台页 <https://everyinfra.com/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
+- 速卖通其他 1 个能力的单价见平台页 <https://everyinfra.com/aliexpress-api?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
 
 ### 返回字段
 
-下面是这 4 个能力实测返回的字段，含义取自接口文档每条说明的第一句，完整说明在每张表下面的链接里。
+下面是这 5 个能力实测返回的字段，含义取自接口文档每条说明的第一句，完整说明在每张表下面的链接里。
 
 #### `search`（关键词搜索）
 
@@ -434,6 +456,23 @@ Claude 网页版和桌面版的自定义连接器、ChatGPT 只能填网址：�
 
 完整参数和字段：<https://everyinfra.com/aliexpress-api/variants?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
 
+#### `ratings`（评分汇总）
+
+| 字段 | 含义 |
+|---|---|
+| `average_star` | 平均星级。 |
+| `total_reviews` | 评价总数（写了文字的评价条数；各档星级的条数还算上只打星的，加起来通常更大）。 |
+| `positive_rate` | 好评率，百分数（94.1 即 94.1%）。 |
+| `negative_rate` | 差评率，百分数。 |
+| `five_star` | 打五星的评分，含 count（条数，算上只打星没写字的）；占比 rate 通常没有。 |
+| `four_star` | 打四星的评分，含 count。 |
+| `three_star` | 打三星的评分，含 count。 |
+| `two_star` | 打二星的评分，含 count。 |
+| `one_star` | 打一星的评分，含 count。 |
+| `platform` | 数据来源平台标识，与请求里的 platform 一致（如 xiaohongshu、tiktok）。 |
+
+完整参数和字段：<https://everyinfra.com/aliexpress-api/ratings?utm_source=github&utm_medium=example_repo&utm_campaign=aliexpress-api>
+
 ### 常见问题
 
 **调用时要不要提供速卖通账号或 Cookie？**
@@ -458,7 +497,7 @@ EveryInfra 服务条款要求你自行确保数据用法符合适用法律和相
 
 ### 实测记录
 
-发布前用本仓的代码对线上接口跑过一遍，命令就是「快速开始」里的 4 条。
+发布前用本仓的代码对线上接口跑过一遍，命令就是「快速开始」里的 5 条。
 
 | 命令 | 时间（新加坡时间） | 返回条数 | 扣费 |
 |---|---|---|---|
@@ -466,6 +505,7 @@ EveryInfra 服务条款要求你自行确保数据用法符合适用法律和相
 | `python main.py product "<商品链接>" --out product.json` | 2026-11-25 13:22 | 1 | $0.001389 |
 | `python main.py reviews "<商品链接>" --out reviews.csv` | 2026-11-25 13:23 | 20 | $0.001389 |
 | `python main.py variants "<商品链接>" --out variants.csv` | 2026-11-25 13:27 | 1 | $0.001389 |
+| `python main.py ratings "<商品链接>" --out ratings.json` | 2026-11-25 15:31 | 1 | $0.001389 |
 
 `product_detail` 返回的一条（正文截到 60 字，作者字段没放进来）：
 

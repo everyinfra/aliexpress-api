@@ -4,6 +4,7 @@
   python main.py product "<商品链接>" --out product.json      # 商品详情 / product detail
   python main.py reviews "<商品链接>" --out reviews.csv       # 商品评价 / reviews
   python main.py variants "<商品链接>" --out variants.csv     # 规格变体 / variants
+  python main.py ratings "<商品链接>" --out ratings.json      # 评分汇总 / rating summary
 """
 import argparse
 
@@ -25,7 +26,9 @@ def main():
     r.add_argument("--sort", choices=SORTS, help="newest / relevance")
     v = sub.add_parser("variants", help="商品规格变体 / product variants")
     v.add_argument("url")
-    for x in (s, pr, r, v):
+    ra = sub.add_parser("ratings", help="评分汇总 / rating summary")
+    ra.add_argument("url")
+    for x in (s, pr, r, v, ra):
         x.add_argument("--out", help="存成 .csv 或 .json / write .csv or .json")
     a = p.parse_args()
 
@@ -37,8 +40,10 @@ def main():
     elif a.cmd == "reviews":
         params = {"url": a.url, **({"sort": a.sort} if a.sort else {})}
         rows, charged = fetch("reviews", params)
-    else:
+    elif a.cmd == "variants":
         rows, charged = fetch("variants", {"url": a.url})
+    else:
+        rows, charged = fetch("ratings", {"url": a.url})
     report(rows, charged, a.out)
 
 

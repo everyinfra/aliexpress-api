@@ -7,15 +7,16 @@
 #   bash examples/curl.sh product_detail "<product url>" # search 结果里的 url / the url from a search result
 #   bash examples/curl.sh reviews "<product url>"
 #   bash examples/curl.sh variants "<product url>"
+#   bash examples/curl.sh ratings "<product url>"
 set -euo pipefail
 : "${EVERYINFRA_API_KEY:?Set EVERYINFRA_API_KEY first: https://everyinfra.com/docs#quickstart}"
-action=${1:?"usage: bash examples/curl.sh <search|product_detail|reviews|variants> <value>"}
+action=${1:?"usage: bash examples/curl.sh <search|product_detail|reviews|variants|ratings> <value>"}
 value=${2:?"value: a keyword or a product url"}
 
 case "$action" in
-  search)                              params="{\"keyword\":\"$value\"}" ;;
-  product_detail | reviews | variants) params="{\"url\":\"$value\"}" ;;
-  *) echo "unknown action: $action (use search, product_detail, reviews or variants)" >&2; exit 2 ;;
+  search)                                        params="{\"keyword\":\"$value\"}" ;;
+  product_detail | reviews | variants | ratings) params="{\"url\":\"$value\"}" ;;
+  *) echo "unknown action: $action (use search, product_detail, reviews, variants or ratings)" >&2; exit 2 ;;
 esac
 
 curl -sS -X POST https://api.everyinfra.com/api/v1/social \
